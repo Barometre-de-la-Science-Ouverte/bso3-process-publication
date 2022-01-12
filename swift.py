@@ -77,15 +77,8 @@ class Swift(object):
         Bulk upload of a list of files to current SWIFT object storage container under the same destination path
         """
         # Slightly modified to be able to upload to more than one dest_path
-        objs = []
-
-        # file object
-        for file_path, dest_path in file_paths:
-            file_name = os.path.basename(file_path)
-            object_name = dest_path + "/" + file_name
-
-            obj = SwiftUploadObject(file_path, object_name=object_name)
-            objs.append(obj)
+        objs = [SwiftUploadObject(file_path, object_name=dest_path)\
+            for file_path, dest_path in file_paths]
 
         try:
             for result in self.swift.upload(self.config["swift_container"], objs):
@@ -113,7 +106,11 @@ class Swift(object):
                     # print("'%s' downloaded" % down_res['object'])
                     local_path = down_res['path']
                     # print(local_path)
-                    shutil.move(local_path, dest_path)
+                    try:
+                        shutil.move(local_path, dest_path)
+                    except shutil.Error:
+                        logger.exception("error moving file" + dest_path)
+                        continue
                 else:
                     logger.error("'%s' download failed" % down_res['object'])
         except SwiftError:

@@ -6,6 +6,9 @@ __pycache__/
 # config
 config/*.json
 
+# Mac stuff
+.DS_Store
+
 # C extensions
 *.so
 
