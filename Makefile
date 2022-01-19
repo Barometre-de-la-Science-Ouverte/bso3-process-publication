@@ -1,3 +1,6 @@
+DOCKER_IMAGE_NAME=dataesr/bso3-process-publication
+CURRENT_VERSION=$(shell cat application/__init__.py | cut -d "'" -f 2)
+
 all: 
 	@make download_file_from_ovh
 	@make process_pipeline
@@ -24,3 +27,23 @@ clean:
 	@rm -rf *pdf
 	@rm -rf *gz
 	@rm -rf ./lmdb/entries_software
+
+docker-build:
+	@echo Building a new docker image
+	docker build --no-cache -t $(DOCKER_IMAGE_NAME):$(CURRENT_VERSION) -t $(DOCKER_IMAGE_NAME):latest .
+	@echo Docker image built
+
+docker-run:
+	@echo Running the created docker image in a container
+	docker run $(DOCKER_IMAGE_NAME):latest
+
+docker-push:
+	@echo Pushing a new docker image
+	docker push $(DOCKER_IMAGE_NAME):$(CURRENT_VERSION)
+	docker push $(DOCKER_IMAGE_NAME):latest
+	@echo Docker image pushed
+
+install:
+	@echo Installing dependencies...
+	pip install -r requirements.txt
+	@echo End of dependencies installation
