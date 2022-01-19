@@ -1,4 +1,3 @@
+Flask==2.0.2
 grobid_client==0.7.6
 python_swiftclient==3.13.0
-requests==2.26.0
-software_mentions_client
